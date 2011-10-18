@@ -16,7 +16,8 @@ class UserInfo(models.Model):
 	first_name = models.CharField(max_length=50)
 	last_name = models.CharField(max_length=50)
 	email_id = models.EmailField()
-
+	user = models.OneToOneField(User)
+	
 	def __unicode__(self):
 		return self.email_id
 
