@@ -1,6 +1,14 @@
 <html>
-{{user.is_authenticated}}
-{{user.username}}
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% if user.is_authenticated %}
+Welcome, {{user.username}}
+{% endif %}
 <form method='post'>
 <table>
 {{usform}}

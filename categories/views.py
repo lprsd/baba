@@ -3,7 +3,7 @@ from django.shortcuts import render_to_response, redirect
 from django.http import HttpResponse
 from django.db.models import Count
 from django.template.context import RequestContext
-
+from django.contrib import messages
 from forms import UserForm, CategoryForm, UserCreationForm
 from categories.models import UserInfo, Category
 
@@ -12,33 +12,41 @@ from django.contrib.auth import authenticate, login
 def frontend(request):
 	if request.user.is_authenticated():
 		return frontend_user(request)
-	else:
-		usform = UserCreationForm(request.POST or None)
-		uform = UserForm(request.POST or None)
-		cform = CategoryForm(request.POST or None)
+
+	usform = UserCreationForm(request.POST or None)
+	uform = UserForm(request.POST or None)
+	cform = CategoryForm(data=request.POST or None)
+	
 	if request.method=='POST' and usform.is_valid() and uform.is_valid() and cform.is_valid():
 		signed_up_user = usform.save()
-		user = authenticate(username=usform.cleaned_data['username'],
-		             password=usform.cleaned_data['password1'])
-		login(request,user)
+		newuser = authenticate(username=usform.cleaned_data['username'],
+		             			password=usform.cleaned_data['password1'])
+		login(request, newuser)
 		user_obj = uform.save(commit=False)
 		user_obj.user = signed_up_user
 		user_obj.save()
 		cform.save(user_obj)
-		return redirect('http://inmobi.com')
+		messages.success(request, 'You are signedup and logged in.')
+		return redirect('.')
 	return render_to_response('notification.html',
 	                          locals(),
 	                          RequestContext(request))
 
-
 def frontend_user(request):
 	userinfo = UserInfo.objects.get(user=request.user)
-	uform = UserForm(instance=userinfo)
-	cform = CategoryForm(user_instance=userinfo)
-	if request.method=='POST' and uform.is_valid() and cform.is_valid():
-		user_obj = uform.save()
-		cform.save(user_obj)
-		return redirect("http://google.com")
+	uform = UserForm(instance=userinfo,data=request.POST or None)
+	cform = CategoryForm(user_instance=userinfo,data=request.POST or None)
+	if uform.is_valid() and uform.has_changed():
+		uform.save()
+	if cform.is_valid() and cform.has_changed():
+		cform.save(userinfo)
+	if request.method=='POST':
+		if (uform.has_changed() or cform.has_changed()):
+			messages.success(request, 'Changes saved successfully!')
+			return redirect(".")
+		else:
+			messages.info(request, 'No changes made!')
+			return redirect(".")
 	return render_to_response('notification.html',
 	                          locals(),
 	                          RequestContext(request))
