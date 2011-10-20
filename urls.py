@@ -7,7 +7,9 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'notification.views.home', name='home'),
-    url(r'^notification/', 'categories.views.frontend'),
+    url(r'^notification/$', 'categories.views.frontend'),
+    url(r'^notification/edit/(?P<uhash>\d+)/$', 'categories.views.frontend_user'),
+    url(r'^notification/mail/$', 'categories.views.frontend_user'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

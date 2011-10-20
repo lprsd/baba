@@ -1,15 +1,15 @@
 # Create your views here.
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.db.models import Count
 from django.template.context import RequestContext
 from django.contrib import messages
-from forms import UserForm, CategoryForm, UserCreationForm
+from forms import UserForm, UserDispForm, CategoryForm, UserCreationForm
 from categories.models import UserInfo, Category
 
 from django.contrib.auth import authenticate, login
 
-def frontend(request):
+def frontend_old(request):
 	if request.user.is_authenticated():
 		return frontend_user(request)
 
@@ -32,12 +32,27 @@ def frontend(request):
 	                          locals(),
 	                          RequestContext(request))
 
-def frontend_user(request):
-	userinfo = UserInfo.objects.get(user=request.user)
-	uform = UserForm(instance=userinfo,data=request.POST or None)
+def frontend(request):
+	uform = UserForm(request.POST or None)
+	cform = CategoryForm(data=request.POST or None)
+	
+	if request.method=='POST' and uform.is_valid() and cform.is_valid():
+		user_obj = uform.save(commit=False)
+		user_obj.save()
+		cform.save(user_obj)
+		messages.success(request, 'You are signed-up for the selected notifications')
+		return redirect(user_obj.get_edit_url())
+	return render_to_response('notification.html',
+	                          locals(),
+	                          RequestContext(request))
+
+def frontend_user(request,uhash):
+	userinfo = get_object_or_404(UserInfo,userhash=uhash)
+	uform = UserDispForm(instance=userinfo,data=request.POST or None)
 	cform = CategoryForm(user_instance=userinfo,data=request.POST or None)
 	if uform.is_valid() and uform.has_changed():
 		uform.save()
+		print 'Uform saved'
 	if cform.is_valid() and cform.has_changed():
 		cform.save(userinfo)
 	if request.method=='POST':

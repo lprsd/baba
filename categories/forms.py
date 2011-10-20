@@ -6,9 +6,23 @@ from IPython import embed
 
 class UserForm(forms.ModelForm):
 
+	def clean_email_id(self):
+		try:
+			ui = UserInfo.objects.get(email_id=self.cleaned_data['email_id'])
+			ui.send_edit_link()
+			raise forms.ValidationError('This email is already registered. Check email for a link to edit preferences.')
+		except UserInfo.DoesNotExist:
+			return self.cleaned_data['email_id']
+
 	class Meta:
 		model = UserInfo
-		exclude = ['user']
+		exclude = ['user','userhash']
+
+class UserDispForm(forms.ModelForm):
+
+	class Meta:
+		model = UserInfo
+		exclude = ['user','userhash','email_id']
 
 class CategoryForm(forms.Form):
 	def __init__(self,user_instance=None,*args,**kwargs):

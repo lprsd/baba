@@ -125,3 +125,9 @@ INSTALLED_APPS = (
 # the site admins on every HTTP 500 error when DEBUG=False.
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
+
+EMAIL_HOST='mail.mkhoj.com'
+EMAIL_PORT='25'
+EMAIL_HOST_USER='no-reply@mkhoj.com'
+EMAIL_HOST_PASSWORD='mkhojasdf'
+
