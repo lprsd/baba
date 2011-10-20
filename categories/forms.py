@@ -1,8 +1,6 @@
 from models import Category, UserInfo, UserCategory
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from IPython import embed
-
 
 class UserForm(forms.ModelForm):
 
