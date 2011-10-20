@@ -31,7 +31,7 @@ class UserInfo(models.Model):
 		super(UserInfo,self).save(*args,**kwargs)
 
 	def get_edit_url(self):
-		return "/notification/edit/%s/"%self.userhash
+		return "http://10.14.100.220:8000/notification/edit/%s/"%self.userhash
 
 	def __unicode__(self):
 		return self.email_id

@@ -22,6 +22,20 @@ class UserDispForm(forms.ModelForm):
 		model = UserInfo
 		exclude = ['user','userhash','email_id']
 
+class EmailForm(forms.Form):
+
+	email_id = forms.EmailField()
+
+	def clean_email_id(self):
+		try:
+			ui = UserInfo.objects.get(email_id=self.cleaned_data['email_id'])
+			ui.send_edit_link()
+			return self.cleaned_data['email_id']
+		except UserInfo.DoesNotExist:
+			raise forms.ValidationError('This email is not registered')
+
+
+
 class CategoryForm(forms.Form):
 	def __init__(self,user_instance=None,*args,**kwargs):
 		super(CategoryForm,self).__init__(*args,**kwargs)

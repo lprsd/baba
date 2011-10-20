@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.db.models import Count
 from django.template.context import RequestContext
 from django.contrib import messages
-from forms import UserForm, UserDispForm, CategoryForm, UserCreationForm
+from forms import UserForm, UserDispForm, CategoryForm, UserCreationForm, EmailForm
 from categories.models import UserInfo, Category
 
 from django.contrib.auth import authenticate, login
@@ -62,6 +62,20 @@ def frontend_user(request,uhash):
 		else:
 			messages.info(request, 'No changes made!')
 			return redirect(".")
+	return render_to_response('notification.html',
+	                          locals(),
+	                          RequestContext(request))
+
+def frontend_change(request):
+
+	uform = EmailForm(request.POST or None)
+
+	if uform.is_valid():
+		# form.save()
+		messages.info(request, 'An email has been sent, Please check')
+		return redirect('.')
+
+
 	return render_to_response('notification.html',
 	                          locals(),
 	                          RequestContext(request))
